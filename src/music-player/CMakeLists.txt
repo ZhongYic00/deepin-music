@@ -80,6 +80,9 @@ aux_source_directory(./view/widget/model allSource)
 aux_source_directory(./listView/musicSearchList allSource)
 aux_source_directory(./listView/lyricLineList allSource)
 
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+include_directories(${Python3_INCLUDE_DIRS})
+
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(Dtk REQUIRED IMPORTED_TARGET dtkwidget)
@@ -140,7 +143,8 @@ qt5_use_modules(${CMD_NAME} ${QtModule})
 
 set(TARGET_LIBS Qt5::Widgets Qt5::Core Qt5::Gui Qt5::DBus Qt5::Sql Qt5::Svg Qt5::Xml
      PkgConfig::AV PkgConfig::Dtk PkgConfig::qgsettings PkgConfig::udisks2 icui18n
-    PkgConfig::MPRIS PkgConfig::DBusextended pthread dmusic )
+    PkgConfig::MPRIS PkgConfig::DBusextended pthread dmusic
+    ${Python3_LIBRARIES})
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/src/libdmusic/)
 
 
@@ -154,6 +158,9 @@ endif()
 
 # ------------------------------- install script -------------------------------
 install(TARGETS ${CMD_NAME} DESTINATION bin)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/lyrics-plugin
+    DESTINATION bin
+    FILES_MATCHING PATTERN "*.py")
 # install Translation files:
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/translations
     DESTINATION share/${CMD_NAME}

@@ -219,14 +219,15 @@ void MusicLyricWidget::onMusicPlayed(MediaMeta meta)
     QFileInfo fileInfo(Player::getInstance()->getActiveMeta().localPath);
     QString lrcPath = fileInfo.dir().path() + QDir::separator() + fileInfo.completeBaseName() + ".lrc";
     QFile file(lrcPath);
-    if (!file.exists()) {
-        m_nolyric->show();
-        m_lyricview->hide();
-    } else {
-        m_nolyric->hide();
-        m_lyricview->show();
+    m_nolyric->hide();
+    m_lyricview->show();
+    if (!file.exists()){
+        if(!m_lyricview->getFromWeb(meta)){
+            m_nolyric->show();
+            m_lyricview->hide();
+        }
     }
-    m_lyricview->getFromFile(lrcPath);
+    else m_lyricview->getFromFile(lrcPath);
 }
 
 void MusicLyricWidget::onCoverChanged(MediaMeta meta)
