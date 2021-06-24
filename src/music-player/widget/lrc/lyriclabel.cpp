@@ -92,6 +92,13 @@ void LyricLabel::getFromFile(QString dir)
     this->update();
 }
 
+bool LyricLabel::getFromWeb(const MediaMeta &meta)
+{
+    bool rt = lyric.getFromWeb(meta.title,meta.singer,meta.album,meta.length);
+    this->update();
+    return rt;
+}
+
 void LyricLabel::paintItem(QPainter *painter, int index, const QRect &rect)
 {
     if (index == this->m_currentItem) {

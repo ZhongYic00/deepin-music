@@ -30,6 +30,7 @@ public:
     MusicLyric();
     void parseLyric(const QString& str);
     void getFromFile(QString dir);
+    bool getFromWeb(const QString& name, const QString& artist, const QString& album, const qint64 length);
     //void getFromFileOld(QString dir);
     QString getLineAt(int index);
     int getCount() const;
