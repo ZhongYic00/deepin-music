@@ -24,7 +24,6 @@
 
 #include <DWidget>
 #include "musiclyric.h"
-#include "mediameta.h"
 DWIDGET_USE_NAMESPACE
 
 class AbstractWheelWidget : public DWidget
@@ -73,7 +72,6 @@ class LyricLabel : public AbstractWheelWidget
 public:
     LyricLabel(bool touch, QWidget *parent = nullptr);
     void getFromFile(QString dir);
-    bool getFromWeb(const MediaMeta &meta);
 signals:
     void changeTo(qint64 pos);
     void rightClicked();

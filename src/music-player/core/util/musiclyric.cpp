@@ -20,7 +20,6 @@
  */
 
 #include "musiclyric.h"
-#include <Python.h>
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
@@ -115,33 +114,9 @@ void MusicLyric::parseLyric(const QString &str)
     }
 }
 
-bool MusicLyric::getFromWeb(const QString &name, const QString &artist, const QString &album, const qint64 length)
-{
-    bool rt = false;
-    Py_Initialize();
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append('./')");
-    auto pModule = PyImport_Import(PyUnicode_FromString("get-lyric-from-cloudmusic"));
-    if(pModule){
-        auto pFunc = PyObject_GetAttrString(pModule,"get_lyric");
-        auto pArgs = PyTuple_New(4);
-        PyTuple_SetItem(pArgs,0,Py_BuildValue("s",name.toLocal8Bit().data()));
-        PyTuple_SetItem(pArgs,1,Py_BuildValue("s",artist.toLocal8Bit().data()));
-        PyTuple_SetItem(pArgs,2,Py_BuildValue("s",album.toLocal8Bit().data()));
-        PyTuple_SetItem(pArgs,3,PyLong_FromLongLong(length));
-        auto pReturn = PyObject_CallObject(pFunc,pArgs);
-        if(pReturn){
-            parseLyric(PyUnicode_AsUTF8(pReturn));
-            rt = true;
-        }
-    }
-    Py_Finalize();
-    return rt;
-}
-
 void MusicLyric::getFromFile(QString dir)
 {
-    qDebug() << "Lyric dir:" << dir << Qt::endl;
+    qDebug() << "Lyric dir:" << dir << endl;
     this->filedir = dir;
     //this->offset
     this->line.clear();
