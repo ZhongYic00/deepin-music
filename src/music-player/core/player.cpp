@@ -112,6 +112,10 @@ void Player::init()
             &CommonService::signalCdaSongListChanged, Qt::QueuedConnection);
     //开启cd线程
     startCdaThread();
+
+    m_pDBus = new QDBusInterface("org.freedesktop.login1", "/org/freedesktop/login1",
+                                 "org.freedesktop.login1.Manager", QDBusConnection::systemBus());
+    connect(m_pDBus, SIGNAL(PrepareForSleep(bool)), this, SLOT(onSleepWhenTaking(bool)));
 }
 
 QStringList Player::supportedSuffixList() const
@@ -884,6 +888,38 @@ void Player::setEqualizerCurMode(int curIndex)
         for (int i = 0 ; i < 10; i++) {
             //设置频率值
             m_qvplayer->equalizer()->setAmplificationForBandAt(m_qvplayer->equalizer()->amplificationForBandAt(uint(i)), uint(i));
+        }
+    }
+}
+
+void Player::onSleepWhenTaking(bool sleep)
+{
+    qDebug() << "onSleepWhenTaking:" << sleep;
+    if (sleep) {
+        //休眠记录状态
+        m_Vlcstate = m_qvplayer->state();
+        if (m_Vlcstate == Vlc::Playing) {
+            //休眠唤醒前设置音量为1%
+            readSinkInputPath();
+            if (!m_sinkInputPath.isEmpty()) {
+                QDBusInterface ainterface("com.deepin.daemon.Audio", m_sinkInputPath,
+                                          "com.deepin.daemon.Audio.SinkInput",
+                                          QDBusConnection::sessionBus());
+                if (!ainterface.isValid()) {
+                    return ;
+                }
+                //调用设置音量
+                ainterface.call(QLatin1String("SetVolume"), 0.01, false);
+            }
+        }
+    } else { //设置状态
+        if (m_Vlcstate == Vlc::Playing) {
+            //播放
+            resume();
+            QTimer::singleShot(2000, [ = ]() {
+                //2s后恢复
+                setMusicVolume(m_volume);
+            });
         }
     }
 }
